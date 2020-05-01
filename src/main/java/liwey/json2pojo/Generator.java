@@ -22,6 +22,7 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -45,10 +46,10 @@ import org.jboss.dna.common.text.Inflector;
 
 /**
  * Contains the code to generate Java POJO classes from given JSON text.
+ * <br>
+ * use <a href="https://github.com/phax/jcodemodel">JCodeModel</a>
  */
 class Generator {
-  private static final JsonParser jsonParser = new JsonParser();
-
   private final String moduleSourceRoot;
   private final String packageName;
   private final JTextField resultTextField;
@@ -84,7 +85,7 @@ class Generator {
     deferredList = codeModel.ref(List.class).narrow(Deferred.class);
 
     // Parse the JSON data
-    JsonElement rootNode = jsonParser.parse(json);
+    JsonElement rootNode = JsonParser.parseString(json);
 
     // Recursively generate
     int classCount = generate(rootNode.getAsJsonObject(), formatClassName(rootName), codeModelPackage);
@@ -108,6 +109,7 @@ class Generator {
 
     // Now create the actual fields
     for (JDefinedClass clazz : definedClasses.values()) {
+      clazz._implements(Serializable.class);
       // Generate the fields
       SwingUtilities.invokeLater(() -> {
         if (resultTextField != null) {
@@ -147,10 +149,13 @@ class Generator {
       JsonElement childNode = entry.getValue();
 
       // Recurse into objects and arrays
+      //对象类解析
       if (childNode.isJsonObject()) {
         String childName = formatClassName(childProperty);
         parseObject(childNode.getAsJsonObject(), childName, codeModelPackage);
-      } else if (childNode.isJsonArray()) {
+      }
+      //集合类型解析
+      else if (childNode.isJsonArray()) {
         String childName = formatClassName(Inflector.getInstance().singularize(childProperty));
         parseArray(childNode.getAsJsonArray(), childName, codeModelPackage);
       }
@@ -174,10 +179,7 @@ class Generator {
   private void parseArray(JsonArray arrayNode, String className, JPackage codeModelPackage) throws
         Exception {
     // Retrieve the first non-null element of the array
-    Iterator<JsonElement> elementsIterator = arrayNode.iterator();
-    while (elementsIterator.hasNext()) {
-      JsonElement element = elementsIterator.next();
-
+    for (JsonElement element : arrayNode) {
       // Recurse on the first object or array
       if (element.isJsonObject()) {
         parseObject(element.getAsJsonObject(), className, codeModelPackage);

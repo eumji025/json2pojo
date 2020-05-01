@@ -1,27 +1,46 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.1'
+    id 'org.jetbrains.intellij' version '0.4.18'
     id 'java'
     id 'idea'
 }
 
+repositories {
+    mavenLocal()
+    maven { url "https://maven.aliyun.com/repository/public" }
+    maven{ url "https://maven.aliyun.com/repository/jcenter"}
+    maven{ url "https://maven.aliyun.com/repository/google"}
+    maven{ url "https://maven.aliyun.com/repository/gradle-plugin"}
+    maven{ url "https://maven.aliyun.com/repository/spring"}
+    maven{ url "https://maven.aliyun.com/repository/spring-plugin"}
+    maven{ url "https://maven.aliyun.com/repository/grails-core"}
+    maven{ url "https://maven.aliyun.com/repository/apache-snapshots"}
+    jcenter()
+    mavenCentral()
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'org.jetbrains.intellij'
+
 group 'liwey'
 version '1.1'
 
-repositories {
-    mavenCentral()
-}
+
 
 dependencies {
     compile files("libs/lombok.jar")
     compile "com.sun.codemodel:codemodel:2.6"
-    compileOnly "org.projectlombok:lombok:1.18.4"
+    annotationProcessor 'org.projectlombok:lombok:1.18.2'
+    compileOnly 'org.projectlombok:lombok:1.18.2'
 }
 
 intellij {
-    version '2018.3'
-}
+    version '2020.1'
+    type 'IU'
 
+
+}
+//see https://intellij-support.jetbrains.com/hc/en-us/community/posts/360003338799-Build-compatible-plugin
 patchPluginXml {
     sinceBuild '162.00'
-    untilBuild '201.00'
 }

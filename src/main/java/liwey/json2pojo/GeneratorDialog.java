@@ -1,5 +1,7 @@
 package liwey.json2pojo;
 
+import com.intellij.ui.JBColor;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -91,7 +93,7 @@ public class GeneratorDialog extends JDialog {
       Generator generator = new Generator(packageName, destPath, resultTextField);
       try {
         int n = generator.generateFromJson(txtClassName.getText(), jsonTextArea.getText());
-        resultTextField.setForeground(Color.blue);
+        resultTextField.setForeground(JBColor.BLUE);
         resultTextField.setText(R.get("generate.result", n, packageName));
         resultTextField.setToolTipText(R.get("success"));
         //dispose();
@@ -99,7 +101,7 @@ public class GeneratorDialog extends JDialog {
         Throwable cause = e;
         while (cause.getCause() != null)
           cause = e.getCause();
-        resultTextField.setForeground(Color.red);
+        resultTextField.setForeground(JBColor.RED);
         resultTextField.setText(cause.getMessage());
         StringWriter writer = new StringWriter();
         cause.printStackTrace(new PrintWriter(writer));
